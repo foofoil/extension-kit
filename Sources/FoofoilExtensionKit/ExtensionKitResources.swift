@@ -1,3 +1,4 @@
+@_exported import FoofoilExtensionABI
 import Foundation
 
 public enum ExtensionKitResources {
