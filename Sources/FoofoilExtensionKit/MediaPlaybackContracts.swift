@@ -73,6 +73,8 @@ public struct MediaPlaybackQueueSnapshot: Codable, Equatable, Sendable {
     public var repeatMode: ExtensionMediaRepeatMode
     public var isShuffled: Bool
     public var revision: UInt64
+    /// 容器专辑标题；外部文件队列为空。
+    public var title: String?
 
     public init(
         contractVersion: UInt32 = 1,
@@ -80,7 +82,8 @@ public struct MediaPlaybackQueueSnapshot: Codable, Equatable, Sendable {
         currentItemID: String? = nil,
         repeatMode: ExtensionMediaRepeatMode = .off,
         isShuffled: Bool = false,
-        revision: UInt64 = 0
+        revision: UInt64 = 0,
+        title: String? = nil
     ) {
         self.contractVersion = contractVersion
         self.items = items
@@ -88,6 +91,7 @@ public struct MediaPlaybackQueueSnapshot: Codable, Equatable, Sendable {
         self.repeatMode = repeatMode
         self.isShuffled = isShuffled
         self.revision = revision
+        self.title = title
     }
 }
 
