@@ -18,6 +18,7 @@ struct ContractTests {
 
         #expect(manifest.id == "app.foofoil.extension.test")
         #expect(manifest.providers.map(\.id) == ["test.content", "test.audio-enhancer"])
+        #expect(manifest.providers.last?.contentFamily == .audio)
         #expect(manifest.capabilities.map(\.id).contains(ExtensionCapabilityIdentifier.navigator))
         #expect(ExtensionAPI.negotiate(with: manifest.extensionAPI) == 1)
 

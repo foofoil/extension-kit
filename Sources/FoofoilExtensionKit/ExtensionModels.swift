@@ -74,6 +74,14 @@ public enum ExtensionProviderRole: String, Codable, Sendable {
     case override
 }
 
+/// Provider 内容所属的宿主呈现家族。它只用于把扩展格式归入宿主已有的
+/// 列表与交互模型；具体解码器仍由每次打开时的 provider resolution 决定。
+public enum ExtensionContentFamily: String, Codable, Sendable {
+    case audio
+    case video
+    case image
+}
+
 public enum ContentMatchStrategy: String, Codable, Sendable {
     case fileExtension = "extension"
     case conforms
@@ -98,6 +106,8 @@ public struct ExtensionProviderDeclaration: Codable, Equatable, Sendable {
     public var fallbackProvider: String?
     /// override provider 所属偏好域，例如 audio；旧清单缺失时保持 nil。
     public var enhancementDomain: String?
+    /// 复用宿主统一列表/呈现层的内容家族；旧清单缺失时保持 nil。
+    public var contentFamily: ExtensionContentFamily?
     public let contentTypes: [ContentTypeDeclaration]
 
     public init(
@@ -105,12 +115,14 @@ public struct ExtensionProviderDeclaration: Codable, Equatable, Sendable {
         role: ExtensionProviderRole,
         fallbackProvider: String? = nil,
         enhancementDomain: String? = nil,
+        contentFamily: ExtensionContentFamily? = nil,
         contentTypes: [ContentTypeDeclaration]
     ) {
         self.id = id
         self.role = role
         self.fallbackProvider = fallbackProvider
         self.enhancementDomain = enhancementDomain
+        self.contentFamily = contentFamily
         self.contentTypes = contentTypes
     }
 }
