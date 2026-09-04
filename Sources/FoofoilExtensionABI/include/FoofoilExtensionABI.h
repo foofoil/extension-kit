@@ -37,6 +37,16 @@ typedef struct FoofoilExtensionInterfaceV1 {
     );
     void (*release_bytes)(void *context, uint8_t *bytes, size_t length);
     void (*destroy)(void *context);
+
+    // Optional application-scope capability entry point. Hosts must check
+    // struct_size before reading this appended field.
+    int32_t (*perform_application_command)(
+        void *context,
+        const uint8_t *command_json,
+        size_t command_length,
+        uint8_t **response_json,
+        size_t *response_length
+    );
 } FoofoilExtensionInterfaceV1;
 
 typedef const FoofoilExtensionInterfaceV1 *(*FoofoilExtensionCreateFunction)(uint32_t negotiated_api_version);

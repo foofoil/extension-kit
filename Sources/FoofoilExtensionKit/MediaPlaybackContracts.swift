@@ -115,6 +115,10 @@ public struct AudioOutputDeviceDescriptor: Codable, Equatable, Identifiable, Sen
     public var isConnected: Bool
     public var hasHardwareVolume: Bool
     public var supportedDoPRates: [Int]
+    /// 设备是否公开可写 Hog Mode；真正取得独占仍须在播放前尝试。
+    public var supportsExclusiveMode: Bool
+    /// 设备公开的 PCM nominal sample rate。空数组表示扩展未提供该能力信息。
+    public var supportedPCMSampleRates: [Double]
 
     public init(
         id: String,
@@ -122,7 +126,9 @@ public struct AudioOutputDeviceDescriptor: Codable, Equatable, Identifiable, Sen
         isSystemDefault: Bool = false,
         isConnected: Bool = true,
         hasHardwareVolume: Bool = false,
-        supportedDoPRates: [Int] = []
+        supportedDoPRates: [Int] = [],
+        supportsExclusiveMode: Bool = false,
+        supportedPCMSampleRates: [Double] = []
     ) {
         self.id = id
         self.displayName = displayName
@@ -130,6 +136,107 @@ public struct AudioOutputDeviceDescriptor: Codable, Equatable, Identifiable, Sen
         self.isConnected = isConnected
         self.hasHardwareVolume = hasHardwareVolume
         self.supportedDoPRates = supportedDoPRates
+        self.supportsExclusiveMode = supportsExclusiveMode
+        self.supportedPCMSampleRates = supportedPCMSampleRates
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case id, displayName, isSystemDefault, isConnected, hasHardwareVolume, supportedDoPRates
+        case supportsExclusiveMode, supportedPCMSampleRates
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.init(
+            id: try container.decode(String.self, forKey: .id),
+            displayName: try container.decode(String.self, forKey: .displayName),
+            isSystemDefault: try container.decodeIfPresent(Bool.self, forKey: .isSystemDefault) ?? false,
+            isConnected: try container.decodeIfPresent(Bool.self, forKey: .isConnected) ?? true,
+            hasHardwareVolume: try container.decodeIfPresent(Bool.self, forKey: .hasHardwareVolume) ?? false,
+            supportedDoPRates: try container.decodeIfPresent([Int].self, forKey: .supportedDoPRates) ?? [],
+            supportsExclusiveMode: try container.decodeIfPresent(Bool.self, forKey: .supportsExclusiveMode) ?? false,
+            supportedPCMSampleRates: try container.decodeIfPresent([Double].self, forKey: .supportedPCMSampleRates) ?? []
+        )
+    }
+}
+
+public enum PCMOutputRouteMode: String, Codable, Sendable {
+    case systemDefault
+    case exclusiveDevice
+}
+
+public enum AudioDeviceServiceCommand: String, Codable, Sendable {
+    case snapshot
+    case selectSystemDefault
+    case prepareExclusivePCM
+    case releasePCM
+    case releaseAllPCM
+}
+
+/// application-scope 设备服务请求。clientID 防止旧箔释放新箔刚取得的独占 lease。
+public struct AudioDeviceServiceRequest: Codable, Equatable, Sendable {
+    public let command: AudioDeviceServiceCommand
+    public let clientID: UUID
+    public var selectedDeviceID: String?
+    public var sourceSampleRate: Double?
+    public var channelCount: Int?
+
+    public init(
+        command: AudioDeviceServiceCommand,
+        clientID: UUID,
+        selectedDeviceID: String? = nil,
+        sourceSampleRate: Double? = nil,
+        channelCount: Int? = nil
+    ) {
+        self.command = command
+        self.clientID = clientID
+        self.selectedDeviceID = selectedDeviceID
+        self.sourceSampleRate = sourceSampleRate
+        self.channelCount = channelCount
+    }
+}
+
+/// Hi-Fi application capability 的低频状态；实时 PCM 数据仍由宿主 AVAudioEngine 直接输出。
+public struct AudioDeviceServiceSnapshot: Codable, Equatable, Sendable {
+    public let contractVersion: UInt32
+    public var devices: [AudioOutputDeviceDescriptor]
+    public var pcmRouteMode: PCMOutputRouteMode
+    public var selectedPCMDeviceID: String?
+    public var activeClientID: UUID?
+    public var activeDeviceID: String?
+    public var activeSampleRate: Double?
+    public var sourceSampleRate: Double?
+    public var sampleRateMatched: Bool?
+    public var statusDescription: String?
+    public var failureMessage: String?
+    public var revision: UInt64
+
+    public init(
+        contractVersion: UInt32 = 1,
+        devices: [AudioOutputDeviceDescriptor],
+        pcmRouteMode: PCMOutputRouteMode = .systemDefault,
+        selectedPCMDeviceID: String? = nil,
+        activeClientID: UUID? = nil,
+        activeDeviceID: String? = nil,
+        activeSampleRate: Double? = nil,
+        sourceSampleRate: Double? = nil,
+        sampleRateMatched: Bool? = nil,
+        statusDescription: String? = nil,
+        failureMessage: String? = nil,
+        revision: UInt64 = 0
+    ) {
+        self.contractVersion = contractVersion
+        self.devices = devices
+        self.pcmRouteMode = pcmRouteMode
+        self.selectedPCMDeviceID = selectedPCMDeviceID
+        self.activeClientID = activeClientID
+        self.activeDeviceID = activeDeviceID
+        self.activeSampleRate = activeSampleRate
+        self.sourceSampleRate = sourceSampleRate
+        self.sampleRateMatched = sampleRateMatched
+        self.statusDescription = statusDescription
+        self.failureMessage = failureMessage
+        self.revision = revision
     }
 }
 

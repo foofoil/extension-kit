@@ -86,6 +86,44 @@ struct ContractTests {
         }
     }
 
+    @Test func audioDeviceApplicationServiceRoundTripsAndKeepsLegacyDeviceDefaults() throws {
+        let clientID = UUID()
+        let request = AudioDeviceServiceRequest(
+            command: .prepareExclusivePCM,
+            clientID: clientID,
+            selectedDeviceID: "usb-dac",
+            sourceSampleRate: 96_000,
+            channelCount: 2
+        )
+        let encodedRequest = try JSONEncoder().encode(request)
+        #expect(try JSONDecoder().decode(AudioDeviceServiceRequest.self, from: encodedRequest) == request)
+
+        let snapshot = AudioDeviceServiceSnapshot(
+            devices: [
+                .init(
+                    id: "usb-dac",
+                    displayName: "USB DAC",
+                    supportsExclusiveMode: true,
+                    supportedPCMSampleRates: [44_100, 96_000]
+                )
+            ],
+            pcmRouteMode: .exclusiveDevice,
+            selectedPCMDeviceID: "usb-dac",
+            activeClientID: clientID,
+            activeDeviceID: "usb-dac",
+            activeSampleRate: 96_000,
+            sourceSampleRate: 96_000,
+            sampleRateMatched: true
+        )
+        let encodedSnapshot = try JSONEncoder().encode(snapshot)
+        #expect(try JSONDecoder().decode(AudioDeviceServiceSnapshot.self, from: encodedSnapshot) == snapshot)
+
+        let legacy = Data(#"{"id":"legacy","displayName":"Legacy DAC"}"#.utf8)
+        let legacyDevice = try JSONDecoder().decode(AudioOutputDeviceDescriptor.self, from: legacy)
+        #expect(!legacyDevice.supportsExclusiveMode)
+        #expect(legacyDevice.supportedPCMSampleRates.isEmpty)
+    }
+
     @Test func capabilityNegotiationChecksContractScopeVersionAndDependencies() {
         let declarations: [ExtensionCapabilityDeclaration] = [
             .init(id: ExtensionCapabilityIdentifier.commandProvider, scope: .presentation),
