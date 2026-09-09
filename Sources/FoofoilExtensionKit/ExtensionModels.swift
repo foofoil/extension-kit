@@ -171,6 +171,8 @@ public struct ExtensionCapabilityDeclaration: Codable, Equatable, Sendable {
 }
 
 public enum ExtensionCapabilityIdentifier {
+    public static let mediaTransport = "media.transport"
+    public static let navigatorActions = "ui.navigator-actions"
     public static let sessionLifecycle = "session.lifecycle"
     public static let seekable = "session.seekable"
     public static let mediaPlaybackQueue = "media.playback-queue"
