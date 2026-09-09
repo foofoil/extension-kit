@@ -46,6 +46,7 @@ public struct CapabilityNegotiationResult: Equatable, Sendable {
 
 public enum CapabilityNegotiator {
     public static let v1HostContracts: [HostCapabilityContract] = [
+        .init(id: ExtensionCapabilityIdentifier.sessionLifecycle, maximumContractVersion: 1, scope: .session),
         .init(id: ExtensionCapabilityIdentifier.seekable, maximumContractVersion: 1, scope: .session),
         .init(id: ExtensionCapabilityIdentifier.mediaPlaybackQueue, maximumContractVersion: 1, scope: .session),
         .init(id: ExtensionCapabilityIdentifier.audioEffects, maximumContractVersion: 1, scope: .session),
