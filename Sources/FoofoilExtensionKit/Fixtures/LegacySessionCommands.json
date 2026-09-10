@@ -1,0 +1,242 @@
+[
+  {
+    "comment": "Old host play. New hifi still accepts this commandID.",
+    "commandID": "hifi.play",
+    "session": {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "extensionID": "app.foofoil.extension.hifi",
+      "providerID": "audio.hifi",
+      "request": {
+        "kind": "singleFile",
+        "resource": { "url": "file:///tmp/fixture.dsf" }
+      },
+      "presentation": { "kind": "text", "titleKey": "Test", "body": "Fixture" },
+      "mediaPlayback": {
+        "state": "paused",
+        "position": 0,
+        "duration": 2,
+        "isSeekable": true
+      }
+    }
+  },
+  {
+    "commandID": "hifi.pause",
+    "session": {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "extensionID": "app.foofoil.extension.hifi",
+      "providerID": "audio.hifi",
+      "request": {
+        "kind": "singleFile",
+        "resource": { "url": "file:///tmp/fixture.dsf" }
+      },
+      "presentation": { "kind": "text", "titleKey": "Test", "body": "Fixture" },
+      "mediaPlayback": {
+        "state": "playing",
+        "position": 0.5,
+        "duration": 2,
+        "isSeekable": true
+      }
+    }
+  },
+  {
+    "commandID": "hifi.seek",
+    "session": {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "extensionID": "app.foofoil.extension.hifi",
+      "providerID": "audio.hifi",
+      "request": {
+        "kind": "singleFile",
+        "resource": { "url": "file:///tmp/fixture.dsf" }
+      },
+      "presentation": { "kind": "text", "titleKey": "Test", "body": "Fixture" },
+      "mediaPlayback": {
+        "state": "paused",
+        "position": 1,
+        "duration": 2,
+        "isSeekable": true
+      }
+    }
+  },
+  {
+    "commandID": "hifi.previous",
+    "session": {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "extensionID": "app.foofoil.extension.hifi",
+      "providerID": "audio.hifi",
+      "request": {
+        "kind": "fileCollection",
+        "resources": [
+          { "url": "file:///tmp/fixture-a.dsf" },
+          { "url": "file:///tmp/fixture-b.dsf" }
+        ]
+      },
+      "presentation": { "kind": "text", "titleKey": "Test", "body": "Fixture" },
+      "playbackQueue": {
+        "contractVersion": 1,
+        "items": [
+          { "id": "file:0", "title": "A", "isPlayable": true },
+          { "id": "file:1", "title": "B", "isPlayable": true }
+        ],
+        "currentItemID": "file:1",
+        "repeatMode": "off",
+        "isShuffled": false,
+        "revision": 0
+      }
+    }
+  },
+  {
+    "commandID": "hifi.next",
+    "session": {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "extensionID": "app.foofoil.extension.hifi",
+      "providerID": "audio.hifi",
+      "request": {
+        "kind": "fileCollection",
+        "resources": [
+          { "url": "file:///tmp/fixture-a.dsf" },
+          { "url": "file:///tmp/fixture-b.dsf" }
+        ]
+      },
+      "presentation": { "kind": "text", "titleKey": "Test", "body": "Fixture" },
+      "playbackQueue": {
+        "contractVersion": 1,
+        "items": [
+          { "id": "file:0", "title": "A", "isPlayable": true },
+          { "id": "file:1", "title": "B", "isPlayable": true }
+        ],
+        "currentItemID": "file:0",
+        "repeatMode": "off",
+        "isShuffled": false,
+        "revision": 0
+      }
+    }
+  },
+  {
+    "commandID": "hifi.status",
+    "session": {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "extensionID": "app.foofoil.extension.hifi",
+      "providerID": "audio.hifi",
+      "request": {
+        "kind": "singleFile",
+        "resource": { "url": "file:///tmp/fixture.dsf" }
+      },
+      "presentation": { "kind": "text", "titleKey": "Test", "body": "Fixture" },
+      "mediaPlayback": {
+        "state": "paused",
+        "position": 0,
+        "duration": 2,
+        "isSeekable": true
+      }
+    }
+  },
+  {
+    "commandID": "hifi.close",
+    "session": {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "extensionID": "app.foofoil.extension.hifi",
+      "providerID": "audio.hifi",
+      "request": {
+        "kind": "singleFile",
+        "resource": { "url": "file:///tmp/fixture.dsf" }
+      },
+      "presentation": { "kind": "text", "titleKey": "Test", "body": "Fixture" }
+    }
+  },
+  {
+    "commandID": "hifi.navigator.activate",
+    "session": {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "extensionID": "app.foofoil.extension.hifi",
+      "providerID": "audio.hifi",
+      "request": {
+        "kind": "fileCollection",
+        "resources": [
+          { "url": "file:///tmp/fixture-a.dsf" },
+          { "url": "file:///tmp/fixture-b.dsf" }
+        ]
+      },
+      "presentation": { "kind": "text", "titleKey": "Test", "body": "Fixture" },
+      "navigatorContributions": [
+        {
+          "id": "hifi.playback-queue",
+          "contractVersion": 1,
+          "titleLocalizationKey": "Queue",
+          "style": "flat",
+          "selectionMode": "single",
+          "items": [
+            { "id": "file:0", "title": "A", "isEnabled": true, "isCurrent": false },
+            { "id": "file:1", "title": "B", "isEnabled": true, "isCurrent": true }
+          ],
+          "selectedItemIDs": ["file:1"],
+          "allowedActions": ["activate", "move"],
+          "revision": 0
+        }
+      ]
+    }
+  },
+  {
+    "commandID": "hifi.navigator.move",
+    "session": {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "extensionID": "app.foofoil.extension.hifi",
+      "providerID": "audio.hifi",
+      "request": {
+        "kind": "fileCollection",
+        "resources": [
+          { "url": "file:///tmp/fixture-a.dsf" },
+          { "url": "file:///tmp/fixture-b.dsf" }
+        ]
+      },
+      "presentation": { "kind": "text", "titleKey": "Test", "body": "Fixture" },
+      "navigatorContributions": [
+        {
+          "id": "hifi.playback-queue",
+          "contractVersion": 1,
+          "titleLocalizationKey": "Queue",
+          "style": "flat",
+          "selectionMode": "single",
+          "items": [
+            { "id": "file:1", "title": "B", "isEnabled": true, "isCurrent": true },
+            { "id": "file:0", "title": "A", "isEnabled": true, "isCurrent": false }
+          ],
+          "selectedItemIDs": ["file:1"],
+          "allowedActions": ["activate", "move"],
+          "revision": 1
+        }
+      ]
+    }
+  },
+  {
+    "comment": "Old device menu command. Device UID is opaque after the hifi.device. prefix.",
+    "commandID": "hifi.device.test-dac-uid",
+    "session": {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "extensionID": "app.foofoil.extension.hifi",
+      "providerID": "audio.hifi",
+      "request": {
+        "kind": "singleFile",
+        "resource": { "url": "file:///tmp/fixture.dsf" }
+      },
+      "presentation": { "kind": "text", "titleKey": "Test", "body": "Fixture" },
+      "commands": [
+        {
+          "id": "hifi.output-device",
+          "titleLocalizationKey": "Output Device",
+          "isEnabled": true,
+          "isChecked": false,
+          "modifierFlags": 0
+        },
+        {
+          "id": "hifi.device.test-dac-uid",
+          "titleLocalizationKey": "Output Device",
+          "displayTitle": "Fixture DAC",
+          "parentID": "hifi.output-device",
+          "isEnabled": true,
+          "isChecked": true,
+          "modifierFlags": 0
+        }
+      ]
+    }
+  }
+]
