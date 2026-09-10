@@ -56,6 +56,7 @@ public enum CapabilityNegotiator {
         .init(id: ExtensionCapabilityIdentifier.subtitle, maximumContractVersion: 1, scope: .session),
         .init(id: ExtensionCapabilityIdentifier.controllerInput, maximumContractVersion: 1, scope: .session),
         .init(id: ExtensionCapabilityIdentifier.deviceSelector, maximumContractVersion: 1, scope: .application),
+        .init(id: ExtensionCapabilityIdentifier.contentProbe, maximumContractVersion: 1, scope: .application),
         .init(id: ExtensionCapabilityIdentifier.settingsProvider, maximumContractVersion: 1, scope: .application),
         .init(id: ExtensionCapabilityIdentifier.commandProvider, maximumContractVersion: 1, scope: .presentation),
         .init(id: ExtensionCapabilityIdentifier.navigator, maximumContractVersion: 1, scope: .presentation),

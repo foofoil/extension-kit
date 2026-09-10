@@ -1,12 +1,28 @@
 import Foundation
 
+public enum MediaPlaybackActionKind: String, Codable, Equatable, Sendable, CaseIterable {
+    case play, pause, previous, next, refresh, seek, selectDevice
+}
+
 public enum MediaPlaybackAction: Equatable, Sendable, Codable {
     case play, pause, previous, next, refresh
     case seek(Double)
     case selectDevice(String)
 
+    public var kind: MediaPlaybackActionKind {
+        switch self {
+        case .play: .play
+        case .pause: .pause
+        case .previous: .previous
+        case .next: .next
+        case .refresh: .refresh
+        case .seek: .seek
+        case .selectDevice: .selectDevice
+        }
+    }
+
     private enum CodingKeys: String, CodingKey { case kind, position, deviceID }
-    private enum Kind: String, Codable { case play, pause, previous, next, refresh, seek, selectDevice }
+    private typealias Kind = MediaPlaybackActionKind
 
     public init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
@@ -83,9 +99,12 @@ public struct MediaPlaybackRequest: Codable, Equatable, Sendable {
         guard Self.isSupported(by: session) else { throw MediaTransportError.missingCapability }
         try action.validate()
         if case .seek = action, session.mediaPlayback?.isSeekable != true { throw MediaTransportError.invalidAction }
+        if let available = session.mediaPlayback?.availableActions, !available.contains(action.kind) {
+            throw MediaTransportError.actionUnavailable
+        }
     }
 }
 
 public enum MediaTransportError: Error, Equatable {
-    case unsupportedContract, missingCapability, invalidAction
+    case unsupportedContract, missingCapability, invalidAction, actionUnavailable
 }

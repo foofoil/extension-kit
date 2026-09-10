@@ -181,13 +181,14 @@ public enum ExtensionCapabilityIdentifier {
     public static let subtitle = "video.subtitle"
     public static let controllerInput = "game.controller-input"
     public static let deviceSelector = "audio.device-selection"
+    public static let contentProbe = "content.probe"
     public static let settingsProvider = "application.settings"
     public static let commandProvider = "ui.commands"
     public static let navigator = "ui.navigator"
     public static let presentationAdapter = "ui.presentation"
 
     public static func inferredScope(for identifier: String) -> ExtensionCapabilityScope {
-        if identifier.hasPrefix("application.") || identifier == deviceSelector {
+        if identifier.hasPrefix("application.") || identifier == deviceSelector || identifier == contentProbe {
             return .application
         }
         if identifier.hasPrefix("ui.") {

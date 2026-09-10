@@ -38,7 +38,7 @@
 
 指定曲目已不存在时，返回当前会话而不把旧位置套到其他曲目。历史位置损坏时宿主可以省略位置并保留其他可恢复值；在线请求中的非法位置仍须拒绝。
 
-v1 只覆盖现有媒体快照可表达的曲目与位置，不改变 `ContentSession.stateReference` 语义，不定义插件私有持久化 blob，也不改变书签与历史数据库的所有权。
+v1 只覆盖现有媒体快照可表达的曲目与位置。`ContentSession.stateReference` 仍是宿主 `ExtensionStateStore` 的存储键，不是私有恢复 blob。不透明扩展状态由宿主持久化的 `ContentSession` payload 承载；恢复请求只把扩展必须解释的曲目 ID 与位置发给新会话。本轮不新增恢复 blob 字段，以免改变 `stateReference` 的既有含义。书签与历史数据库仍归宿主。
 
 ## 验证命令
 

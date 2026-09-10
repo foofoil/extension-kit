@@ -48,6 +48,22 @@ struct MediaTransportTests {
         #expect(throws: MediaTransportError.missingCapability) { try MediaPlaybackRequest(action: .pause, session: session).validate() }
     }
 
+    @Test func explicitAvailableActionsDisableWireActionsAndMissingListUsesDefaults() throws {
+        let data = try JSONSerialization.data(withJSONObject: fixtures()[0])
+        var session = try JSONDecoder().decode(MediaPlaybackRequest.self, from: data).session
+        session.mediaPlayback?.availableActions = [.pause, .refresh]
+        try MediaPlaybackRequest(action: .pause, session: session).validate()
+        #expect(throws: MediaTransportError.actionUnavailable) {
+            try MediaPlaybackRequest(action: .play, session: session).validate()
+        }
+        session.mediaPlayback?.availableActions = nil
+        session.mediaPlayback?.state = .paused
+        #expect(session.mediaPlayback?.allows(.play) == true)
+        #expect(session.mediaPlayback?.allows(.pause) == false)
+        #expect(session.mediaPlayback?.allows(.previous, queueItemCount: 2) == true)
+        try MediaPlaybackRequest(action: .pause, session: session).validate()
+    }
+
     @Test func navigationDoesNotInterpretContributionOrItemIDs() throws {
         let data = try JSONSerialization.data(withJSONObject: fixtures()[3])
         var session = try JSONDecoder().decode(NavigatorActionRequest.self, from: data).session

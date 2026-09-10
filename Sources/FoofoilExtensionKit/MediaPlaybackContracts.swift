@@ -25,19 +25,36 @@ public struct MediaPlaybackSnapshot: Codable, Equatable, Sendable {
     public var duration: TimeInterval?
     public var isSeekable: Bool
     public var failureMessage: String?
+    /// 缺省时由状态、isSeekable 与队列长度推导；显式列出时宿主必须遵守。
+    public var availableActions: [MediaPlaybackActionKind]?
 
     public init(
         state: ExtensionMediaPlaybackState = .idle,
         position: TimeInterval = 0,
         duration: TimeInterval? = nil,
         isSeekable: Bool = false,
-        failureMessage: String? = nil
+        failureMessage: String? = nil,
+        availableActions: [MediaPlaybackActionKind]? = nil
     ) {
         self.state = state
         self.position = position
         self.duration = duration
         self.isSeekable = isSeekable
         self.failureMessage = failureMessage
+        self.availableActions = availableActions
+    }
+
+    public func allows(_ kind: MediaPlaybackActionKind, queueItemCount: Int = 0) -> Bool {
+        if let availableActions {
+            return availableActions.contains(kind)
+        }
+        switch kind {
+        case .play: return state != .playing && state != .loading
+        case .pause: return state == .playing
+        case .seek: return isSeekable
+        case .previous, .next: return queueItemCount > 1
+        case .refresh, .selectDevice: return true
+        }
     }
 }
 
@@ -180,6 +197,13 @@ public struct AudioDeviceServiceRequest: Codable, Equatable, Sendable {
     public var selectedDeviceID: String?
     public var sourceSampleRate: Double?
     public var channelCount: Int?
+
+    /// 多个声明时由宿主按 audio 域偏好选择；无偏好且多于一个则不选用。
+    public static func isDeclared(in declarations: [ExtensionCapabilityDeclaration]) -> Bool {
+        CapabilityNegotiator.negotiate(declarations).accepted.contains {
+            $0.declaration.id == ExtensionCapabilityIdentifier.deviceSelector
+        }
+    }
 
     public init(
         command: AudioDeviceServiceCommand,

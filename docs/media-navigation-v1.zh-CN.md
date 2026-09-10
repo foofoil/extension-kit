@@ -26,7 +26,13 @@
 | seek | position | 有限且非负的秒数；要求快照可定位，由扩展按真实时长和格式粒度限制 |
 | selectDevice | deviceID | 非空稳定设备 ID；扩展按实际设备状态验证，不信任陈旧菜单快照 |
 
-非法参数在产生播放或设备副作用前拒绝。宿主仍负责跨窗口的播放意图和现有独占交接；本能力本身不表示所有 Provider 都使用独占输出，不新增设备服务发现或抢占策略。
+`MediaPlaybackSnapshot.availableActions` 为可选显式可用动作列表。缺省时宿主按状态、`isSeekable` 和队列长度推导禁用：非 playing/loading 可 play，playing 可 pause，可定位才 seek，队列多于一项才 previous/next，refresh 与 selectDevice 默认可用。显式列表存在时，列表外的动作在进扩展前拒绝（`actionUnavailable`）。未知动作枚举必须拒绝。
+
+非法参数在产生播放或设备副作用前拒绝。宿主仍负责跨窗口的播放意图和现有独占交接；本能力本身不表示所有 Provider 都使用独占输出。
+
+## 列表所有权
+
+宿主 `FileListState` 拥有外部文件的顺序、当前项和循环/随机意图。扩展 `playbackQueue` / `ui.navigator` 贡献拥有容器内部曲目。项目 ID 对宿主不透明；宿主不得合成 `file:` 一类私有前缀，也不得写死 `hifi.playback-queue`。导航动作使用会话里实际贡献 ID。容器投影把扩展 ID 存在 `FileListCueInfo.containerTrackID`，宿主列表项 ID 仍由宿主分配。
 
 ## 导航动作
 
