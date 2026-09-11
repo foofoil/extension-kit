@@ -14,7 +14,7 @@ The long-term binary boundary is the C ABI (`foofoil_extension_create`) and JSON
 
 1. **Keep the kit small.** Add only contracts, schema, fixtures, and tests that extensions and the host actually share.
 2. **Prefer Apple frameworks.** Use Foundation and existing value types. Do not add a third-party dependency unless native APIs cannot meet the requirement.
-3. **Preserve ABI and decoding compatibility.** Existing hosts and extensions must continue to load. New Codable fields must decode as optional with sensible defaults. C function-table fields may only be appended; callers must check struct size and function pointers.
+3. **Preserve ABI and decoding compatibility for released contracts.** This applies to the public C ABI and versioned contracts that hosts and extensions actually consume; it does not require reviving unreleased P0 private `hifi.*` command protocols, which are closed. New Codable fields must decode as optional with sensible defaults. C function-table fields may only be appended; callers must check struct size and function pointers.
 4. **Prefer incremental change.** Reuse existing types and validators. Keep diffs focused.
 
 ## Architecture

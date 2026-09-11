@@ -7,7 +7,6 @@
 | `Fixtures/SessionLifecycleRequests.json` | `session.lifecycle` v1 关闭/恢复 |
 | `Fixtures/MediaNavigationRequests.json` | `media.transport` / `ui.navigator.action`；供 hifi smoke 执行 |
 | `Fixtures/AudioDeviceServiceMessages.json` | 应用级设备服务请求与快照，走 `perform_application_command` |
-| `Fixtures/LegacySessionCommands.json` | 旧 `hifi.*` `perform_command` 消息 |
 | `Fixtures/HistoryAndQueueSnapshots.json` | 恢复请求、通用/容器队列、宿主 `WindowConfig` 子集、未进入 smoke 的 play/selectDevice |
 
 ## 设备服务

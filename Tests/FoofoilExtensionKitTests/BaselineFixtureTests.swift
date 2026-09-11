@@ -8,11 +8,6 @@ struct BaselineFixtureTests {
         return try #require(JSONSerialization.jsonObject(with: Data(contentsOf: url)) as? [String: Any])
     }
 
-    private func fixtureArray(_ name: String) throws -> [[String: Any]] {
-        let url = try #require(ExtensionKitResources.fixture(named: name))
-        return try #require(JSONSerialization.jsonObject(with: Data(contentsOf: url)) as? [[String: Any]])
-    }
-
     @Test func deviceServiceRequestsRoundTripAndKeepLegacyDefaults() throws {
         let catalog = try fixtureJSON("AudioDeviceServiceMessages")
         let requests = try #require(catalog["requests"] as? [[String: Any]])
@@ -120,23 +115,6 @@ struct BaselineFixtureTests {
             )
             try request.validate()
             #expect(request.session.providerID == "test.generic-audio")
-        }
-    }
-
-    @Test func legacyCommandsKeepHifiWireIDsAndDecodeSessions() throws {
-        let commands = try fixtureArray("LegacySessionCommands")
-        #expect(commands.map { $0["commandID"] as? String } == [
-            "hifi.play", "hifi.pause", "hifi.seek", "hifi.previous", "hifi.next",
-            "hifi.status", "hifi.close", "hifi.navigator.activate", "hifi.navigator.move",
-            "hifi.device.test-dac-uid"
-        ])
-        for object in commands {
-            let sessionObject = try #require(object["session"] as? [String: Any])
-            let session = try JSONDecoder().decode(
-                ContentSession.self,
-                from: JSONSerialization.data(withJSONObject: sessionObject)
-            )
-            #expect(session.providerID == "audio.hifi")
         }
     }
 }
