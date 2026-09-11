@@ -49,6 +49,8 @@ struct BaselineFixtureTests {
         #expect(!legacyDevice.supportsExclusiveMode)
         #expect(legacyDevice.supportedPCMSampleRates.isEmpty)
         #expect(legacyDevice.isConnected)
+        // 旧快照没有 isCompatible 字段时缺省为可用。
+        #expect(legacyDevice.isCompatible)
     }
 
     @Test func deviceServiceInvalidCommandsAreRejectedByCodable() throws {

@@ -130,6 +130,9 @@ public struct AudioOutputDeviceDescriptor: Codable, Equatable, Identifiable, Sen
     public var displayName: String
     public var isSystemDefault: Bool
     public var isConnected: Bool
+    /// 设备是否可用于当前会话内容（如当前 DSD 速率）。缺省 true；宿主据此禁用不可选设备，
+    /// 但真正的切换校验仍由扩展在 selectDevice 时执行。
+    public var isCompatible: Bool
     public var hasHardwareVolume: Bool
     public var supportedDoPRates: [Int]
     /// 设备是否公开可写 Hog Mode；真正取得独占仍须在播放前尝试。
@@ -142,6 +145,7 @@ public struct AudioOutputDeviceDescriptor: Codable, Equatable, Identifiable, Sen
         displayName: String,
         isSystemDefault: Bool = false,
         isConnected: Bool = true,
+        isCompatible: Bool = true,
         hasHardwareVolume: Bool = false,
         supportedDoPRates: [Int] = [],
         supportsExclusiveMode: Bool = false,
@@ -151,6 +155,7 @@ public struct AudioOutputDeviceDescriptor: Codable, Equatable, Identifiable, Sen
         self.displayName = displayName
         self.isSystemDefault = isSystemDefault
         self.isConnected = isConnected
+        self.isCompatible = isCompatible
         self.hasHardwareVolume = hasHardwareVolume
         self.supportedDoPRates = supportedDoPRates
         self.supportsExclusiveMode = supportsExclusiveMode
@@ -158,7 +163,7 @@ public struct AudioOutputDeviceDescriptor: Codable, Equatable, Identifiable, Sen
     }
 
     private enum CodingKeys: String, CodingKey {
-        case id, displayName, isSystemDefault, isConnected, hasHardwareVolume, supportedDoPRates
+        case id, displayName, isSystemDefault, isConnected, isCompatible, hasHardwareVolume, supportedDoPRates
         case supportsExclusiveMode, supportedPCMSampleRates
     }
 
@@ -169,6 +174,7 @@ public struct AudioOutputDeviceDescriptor: Codable, Equatable, Identifiable, Sen
             displayName: try container.decode(String.self, forKey: .displayName),
             isSystemDefault: try container.decodeIfPresent(Bool.self, forKey: .isSystemDefault) ?? false,
             isConnected: try container.decodeIfPresent(Bool.self, forKey: .isConnected) ?? true,
+            isCompatible: try container.decodeIfPresent(Bool.self, forKey: .isCompatible) ?? true,
             hasHardwareVolume: try container.decodeIfPresent(Bool.self, forKey: .hasHardwareVolume) ?? false,
             supportedDoPRates: try container.decodeIfPresent([Int].self, forKey: .supportedDoPRates) ?? [],
             supportsExclusiveMode: try container.decodeIfPresent(Bool.self, forKey: .supportsExclusiveMode) ?? false,
