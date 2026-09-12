@@ -1,11 +1,11 @@
 import Foundation
 
 public enum MediaPlaybackActionKind: String, Codable, Equatable, Sendable, CaseIterable {
-    case play, pause, previous, next, refresh, seek, selectDevice
+    case play, pause, previous, next, refresh, seek, selectDevice, selectSystemDefault
 }
 
 public enum MediaPlaybackAction: Equatable, Sendable, Codable {
-    case play, pause, previous, next, refresh
+    case play, pause, previous, next, refresh, selectSystemDefault
     case seek(Double)
     case selectDevice(String)
 
@@ -16,6 +16,7 @@ public enum MediaPlaybackAction: Equatable, Sendable, Codable {
         case .previous: .previous
         case .next: .next
         case .refresh: .refresh
+        case .selectSystemDefault: .selectSystemDefault
         case .seek: .seek
         case .selectDevice: .selectDevice
         }
@@ -34,6 +35,7 @@ public enum MediaPlaybackAction: Equatable, Sendable, Codable {
         case .previous: self = .previous
         case .next: self = .next
         case .refresh: self = .refresh
+        case .selectSystemDefault: self = .selectSystemDefault
         case .seek:
             guard let position else { throw MediaTransportError.invalidAction }
             self = .seek(position)
@@ -52,6 +54,7 @@ public enum MediaPlaybackAction: Equatable, Sendable, Codable {
         case .previous: kind = .previous
         case .next: kind = .next
         case .refresh: kind = .refresh
+        case .selectSystemDefault: kind = .selectSystemDefault
         case .seek(let position):
             kind = .seek
             try values.encode(position, forKey: .position)

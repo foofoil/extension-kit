@@ -54,6 +54,7 @@ public struct MediaPlaybackSnapshot: Codable, Equatable, Sendable {
         case .seek: return isSeekable
         case .previous, .next: return queueItemCount > 1
         case .refresh, .selectDevice: return true
+        case .selectSystemDefault: return false
         }
     }
 }
@@ -273,8 +274,10 @@ public struct AudioDeviceServiceSnapshot: Codable, Equatable, Sendable {
 public struct AudioDeviceSelectionSnapshot: Codable, Equatable, Sendable {
     public let contractVersion: UInt32
     public var devices: [AudioOutputDeviceDescriptor]
-    /// nil 表示跟随系统默认输出，避免持久化一次性的 AudioObjectID。
+    /// 当前选中的设备 UID；跟随模式下也保留实际设备，供音量和状态呈现使用。
     public var selectedDeviceID: String?
+    /// 缺省表示扩展未声明跟随模式；以可用的 selectSystemDefault 动作判断支持情况。
+    public var followsSystemDefault: Bool?
     public var outputPolicy: DSDOutputPolicy
     public var activeTransport: AudioOutputTransport?
     public var statusDescription: String?
@@ -284,6 +287,7 @@ public struct AudioDeviceSelectionSnapshot: Codable, Equatable, Sendable {
         contractVersion: UInt32 = 1,
         devices: [AudioOutputDeviceDescriptor],
         selectedDeviceID: String? = nil,
+        followsSystemDefault: Bool? = nil,
         outputPolicy: DSDOutputPolicy = .automatic,
         activeTransport: AudioOutputTransport? = nil,
         statusDescription: String? = nil,
@@ -292,6 +296,7 @@ public struct AudioDeviceSelectionSnapshot: Codable, Equatable, Sendable {
         self.contractVersion = contractVersion
         self.devices = devices
         self.selectedDeviceID = selectedDeviceID
+        self.followsSystemDefault = followsSystemDefault
         self.outputPolicy = outputPolicy
         self.activeTransport = activeTransport
         self.statusDescription = statusDescription

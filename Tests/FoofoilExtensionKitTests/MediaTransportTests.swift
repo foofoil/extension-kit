@@ -24,10 +24,22 @@ struct MediaTransportTests {
     }
 
     @Test func wireActionsIncludePlayAndDeviceSelection() throws {
-        for action: MediaPlaybackAction in [.play, .pause, .seek(42), .selectDevice("opaque-device"), .previous, .next, .refresh] {
+        for action: MediaPlaybackAction in [.play, .pause, .seek(42), .selectDevice("opaque-device"), .selectSystemDefault, .previous, .next, .refresh] {
             try action.validate()
             #expect(try JSONDecoder().decode(MediaPlaybackAction.self, from: JSONEncoder().encode(action)) == action)
         }
+    }
+
+    @Test func systemDefaultSelectionSnapshotPreservesActualDevice() throws {
+        var snapshot = AudioDeviceSelectionSnapshot(
+            devices: [.init(id: "output", displayName: "Output")], selectedDeviceID: "output",
+            followsSystemDefault: true
+        )
+        let data = try JSONEncoder().encode(snapshot)
+        #expect(try JSONDecoder().decode(AudioDeviceSelectionSnapshot.self, from: data) == snapshot)
+        snapshot.followsSystemDefault = nil
+        #expect(try JSONDecoder().decode(AudioDeviceSelectionSnapshot.self, from: JSONEncoder().encode(snapshot)).followsSystemDefault == nil)
+        #expect(!MediaPlaybackSnapshot().allows(.selectSystemDefault))
     }
 
     @Test(arguments: [Double.nan, .infinity, -1])

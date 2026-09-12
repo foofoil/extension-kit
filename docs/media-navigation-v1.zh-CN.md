@@ -25,6 +25,7 @@
 | previous / next | 无 | 切到扩展队列相邻项；边界行为由扩展报告，宿主文件列表仍由宿主控制 |
 | seek | position | 有限且非负的秒数；要求快照可定位，由扩展按真实时长和格式粒度限制 |
 | selectDevice | deviceID | 非空稳定设备 ID；扩展按实际设备状态验证，不信任陈旧菜单快照 |
+| selectSystemDefault | 无 | 扩展管理持续跟随系统默认输出；仅在 availableActions 显式声明时显示跟随能力 |
 
 `MediaPlaybackSnapshot.availableActions` 为可选显式可用动作列表。缺省时宿主按状态、`isSeekable` 和队列长度推导禁用：非 playing/loading 可 play，playing 可 pause，可定位才 seek，队列多于一项才 previous/next，refresh 与 selectDevice 默认可用。显式列表存在时，列表外的动作在进扩展前拒绝（`actionUnavailable`）。未知动作枚举必须拒绝。
 
@@ -76,3 +77,5 @@ swift run hifi-runtime-smoke --self-test ../extension-kit/Sources/FoofoilExtensi
 ```
 
 smoke 覆盖暂停、定位、刷新、前后切曲、激活、排序、非法参数和导航动作拒绝，并保留关闭/恢复的兼容回归。合成 DSF 不用于起播或真实设备切换；play 和 selectDevice 的硬件行为仍需真实 DAC 回归。
+
+系统默认路由的 `audioDeviceSelection.followsSystemDefault` 是可选布尔值；缺省不推断为跟随。`selectedDeviceID` 仍报告实际设备 UID，供音量和状态显示使用。宿主发送一次 `selectSystemDefault` 后，由扩展处理默认设备变化，不能在快照刷新时再发送 `selectDevice`。
