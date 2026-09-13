@@ -115,6 +115,9 @@ public struct ContentSession: Codable, Equatable, Identifiable, Sendable {
     public var mediaPlayback: MediaPlaybackSnapshot?
     public var playbackQueue: MediaPlaybackQueueSnapshot?
     public var audioDeviceSelection: AudioDeviceSelectionSnapshot?
+    /// 会话封面/缩略图的本机文件 URL；宿主可复制其像素用于历史缩略图，不得持久化该 URL 本身。
+    /// 文件由扩展持有并随会话生命周期有效；缺省表示无封面。
+    public var thumbnailURL: URL?
     public var stateReference: String?
 
     public init(
@@ -129,6 +132,7 @@ public struct ContentSession: Codable, Equatable, Identifiable, Sendable {
         mediaPlayback: MediaPlaybackSnapshot? = nil,
         playbackQueue: MediaPlaybackQueueSnapshot? = nil,
         audioDeviceSelection: AudioDeviceSelectionSnapshot? = nil,
+        thumbnailURL: URL? = nil,
         stateReference: String? = nil
     ) {
         self.id = id
@@ -142,12 +146,14 @@ public struct ContentSession: Codable, Equatable, Identifiable, Sendable {
         self.mediaPlayback = mediaPlayback
         self.playbackQueue = playbackQueue
         self.audioDeviceSelection = audioDeviceSelection
+        self.thumbnailURL = thumbnailURL
         self.stateReference = stateReference
     }
 
     private enum CodingKeys: String, CodingKey {
         case id, extensionID, providerID, request, presentation, capabilities, commands
-        case navigatorContributions, mediaPlayback, playbackQueue, audioDeviceSelection, stateReference
+        case navigatorContributions, mediaPlayback, playbackQueue, audioDeviceSelection
+        case thumbnailURL, stateReference
     }
 
     public init(from decoder: Decoder) throws {
@@ -170,6 +176,7 @@ public struct ContentSession: Codable, Equatable, Identifiable, Sendable {
             AudioDeviceSelectionSnapshot.self,
             forKey: .audioDeviceSelection
         )
+        thumbnailURL = try container.decodeIfPresent(URL.self, forKey: .thumbnailURL)
         stateReference = try container.decodeIfPresent(String.self, forKey: .stateReference)
     }
 }

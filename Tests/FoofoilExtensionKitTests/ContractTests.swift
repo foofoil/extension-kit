@@ -250,4 +250,26 @@ struct ContractTests {
             try JSONDecoder().decode(NavigatorItem.self, from: raw)
         }
     }
+
+    @Test func contentSessionCarriesOptionalThumbnailURL() throws {
+        let thumbnail = URL(fileURLWithPath: "/tmp/cover.png")
+        let session = ContentSession(
+            extensionID: "app.foofoil.extension.ebook",
+            providerID: "ebook.epub",
+            request: .singleFile(.init(url: URL(fileURLWithPath: "/tmp/Test.epub"))),
+            presentation: .document(url: URL(fileURLWithPath: "/tmp/chapter.html")),
+            thumbnailURL: thumbnail
+        )
+        let encoded = try JSONEncoder().encode(session)
+        #expect(try JSONDecoder().decode(ContentSession.self, from: encoded).thumbnailURL == thumbnail)
+
+        // 旧会话没有该字段时必须缺省为 nil。
+        var object = try #require(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
+        object.removeValue(forKey: "thumbnailURL")
+        let legacy = try JSONDecoder().decode(
+            ContentSession.self,
+            from: JSONSerialization.data(withJSONObject: object)
+        )
+        #expect(legacy.thumbnailURL == nil)
+    }
 }
