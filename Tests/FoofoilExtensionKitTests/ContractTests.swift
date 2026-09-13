@@ -217,4 +217,37 @@ struct ContractTests {
         #expect(decoded.providerID == session.providerID)
         #expect(decoded.mediaPlayback == nil)
     }
+
+    @Test func documentPresentationDecodesRawJSONAndRoundTripsFragment() throws {
+        let raw = Data(#"{"kind":"document","url":"file:///tmp/chapter.html"}"#.utf8)
+        #expect(
+            try JSONDecoder().decode(SessionPresentation.self, from: raw)
+                == .document(url: URL(fileURLWithPath: "/tmp/chapter.html"))
+        )
+
+        let url = try #require(URL(string: "file:///tmp/%E7%AC%AC%E4%B8%80%E7%AB%A0.html#%E6%B3%A8-1"))
+        let encoded = try JSONEncoder().encode(SessionPresentation.document(url: url))
+        #expect(try JSONDecoder().decode(SessionPresentation.self, from: encoded) == .document(url: url))
+    }
+
+    @Test func documentPresentationSessionFixtureValidates() throws {
+        let url = try fixtureURL("DocumentPresentationSession")
+        let fixture = try JSONDecoder().decode(ContentSession.self, from: Data(contentsOf: url))
+        try NavigatorContributionValidator.validate(fixture)
+        try CommandContributionValidator.validate(fixture)
+        guard case .document(let documentURL) = fixture.presentation else {
+            Issue.record("expected document presentation")
+            return
+        }
+        #expect(documentURL == URL(string: "file:///tmp/foofoil-ebook/session/chapter-0000.html"))
+        #expect(fixture.navigatorContributions.first?.items.count == 2)
+        #expect(try JSONDecoder().decode(ContentSession.self, from: JSONEncoder().encode(fixture)) == fixture)
+    }
+
+    @Test func navigatorItemRequiresExplicitBooleans() {
+        let raw = Data(#"{"id":"toc:0","title":"Chapter"}"#.utf8)
+        #expect(throws: DecodingError.self) {
+            try JSONDecoder().decode(NavigatorItem.self, from: raw)
+        }
+    }
 }

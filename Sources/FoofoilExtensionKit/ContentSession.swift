@@ -7,10 +7,13 @@ import Foundation
 
 public enum SessionPresentation: Codable, Equatable, Sendable {
     case text(titleKey: String, body: String)
+    /// 扩展生成的本地文档。`url` 必须是无远端 host 的绝对文件 URL，可带 fragment 表示章节内锚点；
+    /// 文件由扩展持有并随会话生命周期有效，宿主只读加载。
+    case document(url: URL)
     case unavailable(titleKey: String, messageKey: String)
 
-    private enum CodingKeys: String, CodingKey { case kind, titleKey, body, messageKey }
-    private enum Kind: String, Codable { case text, unavailable }
+    private enum CodingKeys: String, CodingKey { case kind, titleKey, body, messageKey, url }
+    private enum Kind: String, Codable { case text, document, unavailable }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -20,6 +23,8 @@ public enum SessionPresentation: Codable, Equatable, Sendable {
                 titleKey: try container.decode(String.self, forKey: .titleKey),
                 body: try container.decode(String.self, forKey: .body)
             )
+        case .document:
+            self = .document(url: try container.decode(URL.self, forKey: .url))
         case .unavailable:
             self = .unavailable(
                 titleKey: try container.decode(String.self, forKey: .titleKey),
@@ -35,6 +40,9 @@ public enum SessionPresentation: Codable, Equatable, Sendable {
             try container.encode(Kind.text, forKey: .kind)
             try container.encode(titleKey, forKey: .titleKey)
             try container.encode(body, forKey: .body)
+        case .document(let url):
+            try container.encode(Kind.document, forKey: .kind)
+            try container.encode(url, forKey: .url)
         case .unavailable(let titleKey, let messageKey):
             try container.encode(Kind.unavailable, forKey: .kind)
             try container.encode(titleKey, forKey: .titleKey)
