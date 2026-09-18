@@ -9,6 +9,8 @@ public enum SessionPresentation: Codable, Equatable, Sendable {
     case text(titleKey: String, body: String)
     /// 扩展生成的本地文档。`url` 必须是无远端 host 的绝对文件 URL，可带 fragment 表示章节内锚点；
     /// 文件由扩展持有并随会话生命周期有效，宿主只读加载。
+    /// 宿主按用户选择的文档背景色覆盖 html/body 的背景（内联 `!important`）；
+    /// 正文容器若另画不透明背景，请改为透明或继承，否则用户设置不会生效。
     case document(url: URL)
     case unavailable(titleKey: String, messageKey: String)
 
