@@ -11,6 +11,10 @@ public enum SessionPresentation: Codable, Equatable, Sendable {
     /// 文件由扩展持有并随会话生命周期有效，宿主只读加载。
     /// 宿主按用户选择的文档背景色覆盖 html/body 的背景（内联 `!important`）；
     /// 正文容器若另画不透明背景，请改为透明或继承，否则用户设置不会生效。
+    /// 文字颜色、字体、行高与段距由宿主写在 html/body 上：颜色/字体是内联属性，
+    /// 行距与段距是自定义属性 `--foofoil-document-line-height`、`--foofoil-document-paragraph-spacing`
+    /// （外加 `--foofoil-document-font-family`）。正文排版想跟随用户设置时，请在自有 `!important`
+    /// 规则里用 `var(--foofoil-document-*, 默认值)`，否则宿主的覆盖到不了元素层。
     case document(url: URL)
     case unavailable(titleKey: String, messageKey: String)
 
