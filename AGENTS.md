@@ -1,14 +1,18 @@
 # Agent Instructions for extension-kit
 
+## Product Strategy (2026-09-29)
+
+Extensions/plugins are a development mechanism only. The final product has no user-facing extension concept: content capabilities ship with foofoil, without separate installation, enablement, or updates. Keep internal module boundaries and existing ABI/type names where useful; they do not imply a public plugin platform or independent release compatibility promise. Do not plan a Registry, marketplace, or Extension Manager as a product feature. Management code/UI remains available for future reuse, but the app hides its entry points and disables startup update checks and installation prompts. Do not delete the underlying extension implementation merely to hide the product concept. The app’s `./run` embeds sibling Hi-Fi and EPUB modules for Debug; `./package-dmg` embeds them for Release distribution.
+
 ## Project Overview
 
-extension-kit is the reusable Extension API for first-party foofoil extensions. It is a Swift package, not an app.
+extension-kit provides shared internal contracts for foofoil development modules. It is a Swift package, not an app.
 
 It owns Extension API v1 contracts: the versioned C ABI, Manifest schema, capability identifiers, `ContentRequest` / `ContentSession` value types, navigator and media snapshots, compatibility fixtures, and contract tests.
 
 Host loading, installation, the Extension Registry client, and UI belong in `foofoil`. Capability implementations such as Hi-Fi belong in their own repositories. Do not move those concerns into this package.
 
-The long-term binary boundary is the C ABI (`foofoil_extension_create`) and JSON value messages. Swift protocols, SwiftUI views, `NSView`, and in-process objects are not part of the public Extension API.
+The current internal binary boundary is the C ABI (`foofoil_extension_create`) and JSON value messages. Swift protocols, SwiftUI views, `NSView`, and in-process objects are not part of the shared module API.
 
 ## Core Principles
 
