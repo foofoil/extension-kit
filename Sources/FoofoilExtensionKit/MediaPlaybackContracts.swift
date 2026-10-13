@@ -57,6 +57,7 @@ public struct MediaPlaybackSnapshot: Codable, Equatable, Sendable {
         case .seek: return isSeekable
         case .previous, .next: return queueItemCount > 1
         case .refresh, .selectDevice: return true
+        case .setSubtitleDelay: return false
         case .setVolume: return volume != nil
         case .selectSystemDefault: return false
         }
