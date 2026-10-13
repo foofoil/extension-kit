@@ -15,11 +15,12 @@ public enum SessionPresentation: Codable, Equatable, Sendable {
     /// 行距与段距是自定义属性 `--foofoil-document-line-height`、`--foofoil-document-paragraph-spacing`
     /// （外加 `--foofoil-document-font-family`）。正文排版想跟随用户设置时，请在自有 `!important`
     /// 规则里用 `var(--foofoil-document-*, 默认值)`，否则宿主的覆盖到不了元素层。
+    case video(VideoPresentationSnapshot)
     case document(url: URL)
     case unavailable(titleKey: String, messageKey: String)
 
-    private enum CodingKeys: String, CodingKey { case kind, titleKey, body, messageKey, url }
-    private enum Kind: String, Codable { case text, document, unavailable }
+    private enum CodingKeys: String, CodingKey { case kind, titleKey, body, messageKey, url, video }
+    private enum Kind: String, Codable { case text, document, video, unavailable }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -29,6 +30,8 @@ public enum SessionPresentation: Codable, Equatable, Sendable {
                 titleKey: try container.decode(String.self, forKey: .titleKey),
                 body: try container.decode(String.self, forKey: .body)
             )
+        case .video:
+            self = .video(try container.decode(VideoPresentationSnapshot.self, forKey: .video))
         case .document:
             self = .document(url: try container.decode(URL.self, forKey: .url))
         case .unavailable:
@@ -46,6 +49,9 @@ public enum SessionPresentation: Codable, Equatable, Sendable {
             try container.encode(Kind.text, forKey: .kind)
             try container.encode(titleKey, forKey: .titleKey)
             try container.encode(body, forKey: .body)
+        case .video(let frame):
+            try container.encode(Kind.video, forKey: .kind)
+            try container.encode(frame, forKey: .video)
         case .document(let url):
             try container.encode(Kind.document, forKey: .kind)
             try container.encode(url, forKey: .url)

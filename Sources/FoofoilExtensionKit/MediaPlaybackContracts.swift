@@ -24,6 +24,7 @@ public struct MediaPlaybackSnapshot: Codable, Equatable, Sendable {
     public var position: TimeInterval
     public var duration: TimeInterval?
     public var isSeekable: Bool
+    public var volume: Double?
     public var failureMessage: String?
     /// 缺省时由状态、isSeekable 与队列长度推导；显式列出时宿主必须遵守。
     public var availableActions: [MediaPlaybackActionKind]?
@@ -33,6 +34,7 @@ public struct MediaPlaybackSnapshot: Codable, Equatable, Sendable {
         position: TimeInterval = 0,
         duration: TimeInterval? = nil,
         isSeekable: Bool = false,
+        volume: Double? = nil,
         failureMessage: String? = nil,
         availableActions: [MediaPlaybackActionKind]? = nil
     ) {
@@ -40,6 +42,7 @@ public struct MediaPlaybackSnapshot: Codable, Equatable, Sendable {
         self.position = position
         self.duration = duration
         self.isSeekable = isSeekable
+        self.volume = volume
         self.failureMessage = failureMessage
         self.availableActions = availableActions
     }
@@ -54,6 +57,7 @@ public struct MediaPlaybackSnapshot: Codable, Equatable, Sendable {
         case .seek: return isSeekable
         case .previous, .next: return queueItemCount > 1
         case .refresh, .selectDevice: return true
+        case .setVolume: return volume != nil
         case .selectSystemDefault: return false
         }
     }
@@ -341,7 +345,8 @@ public enum MediaSessionContractValidator {
 
     public static func validate(_ session: ContentSession) throws {
         if let playback = session.mediaPlayback {
-            guard playback.position.isFinite, playback.position >= 0,
+            guard playback.volume.map({ $0.isFinite && (0...1).contains($0) }) ?? true,
+                  playback.position.isFinite, playback.position >= 0,
                   playback.duration.map({ $0.isFinite && $0 >= 0 && playback.position <= $0 }) ?? true else {
                 throw MediaSessionContractError.invalidPlaybackPosition
             }

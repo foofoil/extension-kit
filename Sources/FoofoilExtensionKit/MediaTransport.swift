@@ -1,11 +1,12 @@
 import Foundation
 
 public enum MediaPlaybackActionKind: String, Codable, Equatable, Sendable, CaseIterable {
-    case play, pause, previous, next, refresh, seek, selectDevice, selectSystemDefault
+    case play, pause, previous, next, refresh, seek, selectDevice, selectSystemDefault, setVolume
 }
 
 public enum MediaPlaybackAction: Equatable, Sendable, Codable {
     case play, pause, previous, next, refresh, selectSystemDefault
+    case setVolume(Double)
     case seek(Double)
     case selectDevice(String)
 
@@ -17,12 +18,13 @@ public enum MediaPlaybackAction: Equatable, Sendable, Codable {
         case .next: .next
         case .refresh: .refresh
         case .selectSystemDefault: .selectSystemDefault
+        case .setVolume: .setVolume
         case .seek: .seek
         case .selectDevice: .selectDevice
         }
     }
 
-    private enum CodingKeys: String, CodingKey { case kind, position, deviceID }
+    private enum CodingKeys: String, CodingKey { case kind, position, deviceID, volume }
     private typealias Kind = MediaPlaybackActionKind
 
     public init(from decoder: Decoder) throws {
@@ -36,6 +38,8 @@ public enum MediaPlaybackAction: Equatable, Sendable, Codable {
         case .next: self = .next
         case .refresh: self = .refresh
         case .selectSystemDefault: self = .selectSystemDefault
+        case .setVolume:
+            self = .setVolume(try values.decode(Double.self, forKey: .volume))
         case .seek:
             guard let position else { throw MediaTransportError.invalidAction }
             self = .seek(position)
@@ -55,6 +59,9 @@ public enum MediaPlaybackAction: Equatable, Sendable, Codable {
         case .next: kind = .next
         case .refresh: kind = .refresh
         case .selectSystemDefault: kind = .selectSystemDefault
+        case .setVolume(let volume):
+            kind = .setVolume
+            try values.encode(volume, forKey: .volume)
         case .seek(let position):
             kind = .seek
             try values.encode(position, forKey: .position)
@@ -67,6 +74,8 @@ public enum MediaPlaybackAction: Equatable, Sendable, Codable {
 
     public func validate() throws {
         switch self {
+        case .setVolume(let volume):
+            guard volume.isFinite && (0...1).contains(volume) else { throw MediaTransportError.invalidAction }
         case .seek(let position):
             guard position.isFinite && position >= 0 else { throw MediaTransportError.invalidAction }
         case .selectDevice(let id):
