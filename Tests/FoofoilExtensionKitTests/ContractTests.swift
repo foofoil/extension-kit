@@ -4,6 +4,21 @@ import FoofoilExtensionABI
 import FoofoilExtensionKit
 
 struct ContractTests {
+    @Test func readingOrderRoundTripsAndRejectsUnknownItems() throws {
+        var contribution = NavigatorContribution(
+            id: "document", titleLocalizationKey: "Table of Contents", style: .flat,
+            items: [NavigatorItem(id: "one", title: "One"), NavigatorItem(id: "two", title: "Two")],
+            readingOrderItemIDs: ["one", "two"], currentReadingOrderItemID: "one"
+        )
+        try NavigatorContributionValidator.validate(contribution)
+        let data = try JSONEncoder().encode(contribution)
+        #expect(try JSONDecoder().decode(NavigatorContribution.self, from: data) == contribution)
+        contribution.readingOrderItemIDs = ["missing"]
+        #expect(throws: NavigatorContributionError.self) {
+            try NavigatorContributionValidator.validate(contribution)
+        }
+    }
+
     private var currentArchitecture: String {
         ExtensionSystemRequirements.currentArchitecture
     }

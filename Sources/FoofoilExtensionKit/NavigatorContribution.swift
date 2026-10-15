@@ -68,6 +68,9 @@ public struct NavigatorContribution: Codable, Equatable, Identifiable, Sendable 
     public var selectedItemIDs: [String]
     public var allowedActions: [NavigatorActionKind]
     public var revision: UInt64
+    /// 正文阅读顺序与当前位置独立于目录选中项，避免小节影响章节切换。
+    public var readingOrderItemIDs: [String]?
+    public var currentReadingOrderItemID: String?
 
     public init(
         id: String,
@@ -78,7 +81,9 @@ public struct NavigatorContribution: Codable, Equatable, Identifiable, Sendable 
         items: [NavigatorItem],
         selectedItemIDs: [String] = [],
         allowedActions: [NavigatorActionKind] = [.activate],
-        revision: UInt64 = 0
+        revision: UInt64 = 0,
+        readingOrderItemIDs: [String]? = nil,
+        currentReadingOrderItemID: String? = nil
     ) {
         self.id = id
         self.contractVersion = contractVersion
@@ -89,6 +94,8 @@ public struct NavigatorContribution: Codable, Equatable, Identifiable, Sendable 
         self.selectedItemIDs = selectedItemIDs
         self.allowedActions = allowedActions
         self.revision = revision
+        self.readingOrderItemIDs = readingOrderItemIDs
+        self.currentReadingOrderItemID = currentReadingOrderItemID
     }
 }
 
@@ -218,6 +225,17 @@ public enum NavigatorContributionValidator {
                 }
                 current = itemsByID[parentID]
             }
+        }
+
+        if let order = contribution.readingOrderItemIDs {
+            guard !order.isEmpty, Set(order).count == order.count,
+                  order.allSatisfy({ itemsByID[$0]?.isEnabled == true }),
+                  let current = contribution.currentReadingOrderItemID, order.contains(current),
+                  contribution.allowedActions.contains(.activate) else {
+                throw NavigatorContributionError.malformedContribution(contribution.id)
+            }
+        } else if contribution.currentReadingOrderItemID != nil {
+            throw NavigatorContributionError.malformedContribution(contribution.id)
         }
 
         let selectedIDs = Set(contribution.selectedItemIDs)
