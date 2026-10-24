@@ -115,6 +115,19 @@ public struct NegotiatedCapability: Codable, Equatable, Sendable {
     }
 }
 
+/// 完整文档的搜索单元；URL 为会话临时、自包含 HTML，定位动作使用既有导航契约。
+public struct DocumentSearchSource: Codable, Equatable, Sendable {
+    public var url: URL
+    public var contributionID: String
+    public var itemID: String
+
+    public init(url: URL, contributionID: String, itemID: String) {
+        self.url = url
+        self.contributionID = contributionID
+        self.itemID = itemID
+    }
+}
+
 public struct ContentSession: Codable, Equatable, Identifiable, Sendable {
     public let id: UUID
     public let extensionID: String?
@@ -130,6 +143,7 @@ public struct ContentSession: Codable, Equatable, Identifiable, Sendable {
     /// 会话封面/缩略图的本机文件 URL；宿主可复制其像素用于历史缩略图，不得持久化该 URL 本身。
     /// 文件由扩展持有并随会话生命周期有效；缺省表示无封面。
     public var thumbnailURL: URL?
+    public var documentSearchSources: [DocumentSearchSource]?
     public var stateReference: String?
 
     public init(
@@ -145,6 +159,7 @@ public struct ContentSession: Codable, Equatable, Identifiable, Sendable {
         playbackQueue: MediaPlaybackQueueSnapshot? = nil,
         audioDeviceSelection: AudioDeviceSelectionSnapshot? = nil,
         thumbnailURL: URL? = nil,
+        documentSearchSources: [DocumentSearchSource]? = nil,
         stateReference: String? = nil
     ) {
         self.id = id
@@ -159,13 +174,14 @@ public struct ContentSession: Codable, Equatable, Identifiable, Sendable {
         self.playbackQueue = playbackQueue
         self.audioDeviceSelection = audioDeviceSelection
         self.thumbnailURL = thumbnailURL
+        self.documentSearchSources = documentSearchSources
         self.stateReference = stateReference
     }
 
     private enum CodingKeys: String, CodingKey {
         case id, extensionID, providerID, request, presentation, capabilities, commands
         case navigatorContributions, mediaPlayback, playbackQueue, audioDeviceSelection
-        case thumbnailURL, stateReference
+        case thumbnailURL, stateReference, documentSearchSources
     }
 
     public init(from decoder: Decoder) throws {
@@ -189,6 +205,7 @@ public struct ContentSession: Codable, Equatable, Identifiable, Sendable {
             forKey: .audioDeviceSelection
         )
         thumbnailURL = try container.decodeIfPresent(URL.self, forKey: .thumbnailURL)
+        documentSearchSources = try container.decodeIfPresent([DocumentSearchSource].self, forKey: .documentSearchSources)
         stateReference = try container.decodeIfPresent(String.self, forKey: .stateReference)
     }
 }

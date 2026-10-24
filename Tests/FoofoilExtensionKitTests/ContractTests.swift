@@ -215,6 +215,12 @@ struct ContractTests {
         }
     }
 
+    @Test func wholeDocumentSearchSourcesRoundTrip() throws {
+        var session = ContentSession(extensionID: "test", providerID: "test", request: .singleFile(.init(url: URL(fileURLWithPath: "/tmp/a.epub"))), presentation: .document(url: URL(fileURLWithPath: "/tmp/chapter.html")))
+        session.documentSearchSources = [.init(url: URL(fileURLWithPath: "/tmp/chapter.html"), contributionID: "toc", itemID: "one")]
+        #expect(try JSONDecoder().decode(ContentSession.self, from: JSONEncoder().encode(session)) == session)
+    }
+
     @Test func contentSessionDecodesPreNavigatorPhaseZeroState() throws {
         let session = ContentSession(
             extensionID: "app.foofoil.extension.test",
